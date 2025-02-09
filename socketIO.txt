@@ -1,0 +1,19 @@
+- create new folder(directory for socket io server)
+- "cd 'newfolder'sname'"
+- "npm init -y"
+- "npm install express socket.io"
+- create a file name "index.js" (inside the directory for socket io server)
+- "npm install cors"
+- "<script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>"
+
+:
+- "cd 'newfolder'sname'"
+- node index.js
+- there should be a message "server running at http://localhost:3000."
+- 
+
+
+- "npm init -y"
+- "npm install expresss socket.io"
+- "npm install cors"
+
