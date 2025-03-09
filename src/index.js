@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const socket_IO = require('socket.io');
 const cors = require('cors');
+
 const app = express();
 const server = http.createServer(app);
 const io = socket_IO(server, {
@@ -11,8 +12,10 @@ const io = socket_IO(server, {
   }
 });
 
-
 app.use(cors());
+
+// Store active rooms
+const rooms = new Map();
 
 // socket.IO connection
 io.on('connection', (socket) => {
@@ -22,31 +25,28 @@ io.on('connection', (socket) => {
     const room = `meeting_${meetingId}_manager_${managerId}`;
     console.log(`${role} joined room: ${room}`);
     socket.join(room);
-    socket.room = room;
   });
-
 
   // Handle note updates
   socket.on('update_note', ({ meetingId, managerId, content }) => {
     const room = `meeting_${meetingId}_manager_${managerId}`;
     console.log(`Note updated in room: ${room}, Content: ${content}`);
-
-    // Broadcast the update to all users in the room (except the sender)
-    socket.to(room).emit('note_updated', content);
+    io.in(room).emit('note_updated', content);
   });
 
+  // Handle summary updates (Added from server.js)
+  socket.on('update_summary', ({ meetingId, managerId, content }) => {
+    const room = `meeting_${meetingId}_manager_${managerId}`;
+    console.log(`Summary updated in room: ${room}, Content: ${content}`);
+    io.in(room).emit('summary_updated', content);
+  });
 
-
-
-  // Handle convo updates
+  // Handle conversation updates
   socket.on('from_client_convo_update', ({ meetingId, managerId, content }) => {
     const room = `meeting_${meetingId}_manager_${managerId}`;
     console.log(`Convo updated in room: ${room}, Content: ${content}`);
-
-    // Broadcast the update to all users in the room (except the sender)
-    socket.to(room).emit('conversation_updated', content);
+    io.in(room).emit('conversation_updated', content);
   });
-
 
   socket.on('disconnect', () => {
     console.log('A user disconnected.');
